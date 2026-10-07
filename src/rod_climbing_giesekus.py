@@ -66,6 +66,7 @@ import math
 from pathlib import Path
 
 from pyoomph import *
+
 from pyoomph.equations.navier_stokes import (
     NavierStokesEquations,
     NavierStokesFreeSurface,
@@ -73,13 +74,13 @@ from pyoomph.equations.navier_stokes import (
     NavierStokesAzimuthalComponent,
     NoSlipBC,
 )
+
 from pyoomph.equations.viscoelastic import ViscoelasticEquations, Giesekus
 from pyoomph.equations.ALE import PseudoElasticMesh, EnforceVolumeByPressure
 from pyoomph.meshes.simplemeshes import RectangularQuadMesh
 from pyoomph.expressions import *
-from pyoomph.expressions.coordsys import axisymmetric
+# from pyoomph.expressions.coordsys import axisymmetric
 from pyoomph.expressions.units import degree
-
 
 # =============================================================================
 # USER PARAMETERS
