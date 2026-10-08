@@ -72,6 +72,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
+import numpy as np
 
 from pyoomph import *
 
@@ -99,24 +100,24 @@ from pyoomph.meshes.simplemeshes import RectangularQuadMesh
 #
 
 # Geometry
-ROD_RADIUS = 1.0
-OUTER_RADIUS = 10.0
+ROD_RADIUS = 4e-3
+OUTER_RADIUS = 10*4e-3
 
 # Rotation
-OMEGA_TARGET = 1.0                 # rod angular velocity
-OMEGA_INITIAL = 0.02               # continuation starting point
-N_OMEGA_STEPS = 8
+OMEGA_TARGET = 5                 # rod angular velocity
+OMEGA_INITIAL = 0.1               # continuation starting point
+N_OMEGA_STEPS = 11
 
 # Fluid
-RHO = 1.0                          # density
-ETA_S = 0.5                        # solvent viscosity
-ETA_P = 0.5                        # polymer viscosity
-LAMBDA = 1.0                       # Giesekus relaxation time
+RHO = 997                          # density
+ETA_S = 1e-3                        # solvent viscosity
+ETA_P = 10                        # polymer viscosity
+LAMBDA = 0.2                      # Giesekus relaxation time
 GIESEKUS_ALPHA = 0.1               # 0 <= alpha <= 1/2
 
 # External physics
-GRAVITY = 1.0                      # gravitational acceleration
-SURFACE_TENSION = 1.0              # gamma
+GRAVITY = 9.81                     # gravitational acceleration
+SURFACE_TENSION = 72e-3              # gamma
 ATMOSPHERIC_PRESSURE = 0.0         # gauge atmospheric pressure
 
 # Contact angle (liquid side, measured from the wall into the liquid)
@@ -124,7 +125,7 @@ CONTACT_ANGLE_DEG = 90.0
 
 # Numerical depth used to approximate z -> -infinity.
 # Increase this until h(r) and stresses are insensitive to DEPTH.
-DEPTH = 25.0
+DEPTH = 15*ROD_RADIUS
 
 # Meridional slip length (in units of the rod radius a) on the two vertical
 # walls.  The azimuthal velocity stays no-slip; the (r,z) velocity gets
@@ -145,8 +146,8 @@ WALL_SLIP_LENGTH = 1.0e-2
 BOTTOM_CONDITION = "farfield"
 
 # Mesh
-NR = 60
-NZ = 120
+NR = 256
+NZ = 256
 
 # Constitutive stabilization.
 # Start at zero.  After the first converged solution, ramping this toward 1
@@ -166,7 +167,7 @@ NEWTON_TOL = 1.0e-8
 MAX_NEWTON_ITER = 50
 
 # Output
-OUTPUT_DIRECTORY = "rod_climbing_output"
+OUTPUT_DIRECTORY = "lev16_0.2s_relTime_logSpacedOmega_realisticVals_rod_climbing_output"
 
 # Run controls
 RUN_CONTINUATION = True
@@ -765,10 +766,11 @@ class RodClimbingGiesekusProblem(Problem):
             omega_values = [1.0]
         else:
             # Linear steps from the starting value to 1.
-            omega_values = [
-                start + (1.0 - start) * i / (N_OMEGA_STEPS - 1)
-                for i in range(N_OMEGA_STEPS)
-            ]
+            # omega_values = [
+            #     start + (1.0 - start) * i / (N_OMEGA_STEPS - 1)
+            #     for i in range(N_OMEGA_STEPS)
+            # ]
+            omega_values = np.geomspace(start, 1, N_OMEGA_STEPS)
 
         # First solve without SUPG: at the rest state full SUPG can worsen
         # the initial Newton Jacobian.
